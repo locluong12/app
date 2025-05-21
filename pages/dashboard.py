@@ -359,49 +359,15 @@ def show_dashboard():
     # Gộp lại với df_stock
     df_stock = df_stock.merge(df_last_inbound, on='material_no', how='left')
 
-    # Tính số ngày lưu kho
-    today = pd.Timestamp.today().normalize()
-    df_stock['days_in_stock'] = (today - df_stock['last_inbound_date']).dt.days
-
+    
     # Lọc phụ tùng có tồn kho > 0
     df_stock_filtered = df_stock[df_stock['stock'] > 0]
 
     # Chia thành 2 cột
-    col1, col2 = st.columns(2)
+    col2 = st.container()
 
-    # ------------------ CỘT 1: Số ngày lưu kho ------------------
-    with col1:
-        st.markdown("<h3 style='text-align: center; color: white;'>Số ngày lưu kho</h3>", unsafe_allow_html=True)
-
-        chart_lifetime = alt.Chart(df_stock_filtered).mark_bar(
-            cornerRadiusTopLeft=6,
-            cornerRadiusTopRight=6,
-            color='#008080',
-            opacity=0.7
-        ).encode(
-            y=alt.Y('material_no:N', sort='-x', title='Mã phụ tùng'),
-            x=alt.X('days_in_stock:Q', title='Số ngày lưu kho'),
-            tooltip=[
-                alt.Tooltip('material_no:N', title='Mã phụ tùng'),
-                alt.Tooltip('days_in_stock:Q', title='Số ngày lưu kho'),
-                alt.Tooltip('stock:Q', title='Tồn kho hiện tại')
-            ]
-        ).properties(
-            width=350,
-            height=500
-        )
-
-        text_lifetime = chart_lifetime.mark_text(
-            align='center',
-            baseline='bottom',
-            dy=-5,
-            color='white',
-            fontWeight='bold'
-        ).encode(
-            text=alt.Text('days_in_stock:Q')
-        )
-
-        st.altair_chart(chart_lifetime + text_lifetime, use_container_width=True)
+   
+    
 
     # ------------------ CỘT 2: Giá trị xuất kho theo ngày ------------------
     with col2:
